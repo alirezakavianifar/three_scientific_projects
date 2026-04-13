@@ -45,7 +45,7 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-Phishing attacks represent one of the most pervasive, disruptive, and financially damaging cyber threats to global digital security. By maliciously leveraging fraudulent URLs embedded in emails, SMS messages, and social media portals, cybercriminals continuously attempt to harvest sensitive credentials. This comprehensive research report details the rigorous development, execution, and analytical evaluation of an automated Phishing URL detection ecosystem using the massive PhiUSIIL dataset, which encompasses over 235,000 carefully curated URLs. The overarching goal is to evaluate if classical machine learning models (specifically Logistic Regression and Random Forest ensembles) can maintain competitive parity against dense Deep Learning architectures (Multilayer Perceptrons) in the domain of structured URL topological feature mapping. Furthermore, we actively apply mutual-information-based feature selection pipelines to aggressively compress inference latency overhead by reducing the dimensionality from 54 raw features down to the 15 most prominent indicators. Remarkably, due to the inherent linear and structural separability of the underlying URL metrics, the classical configurations achieved immense robustness, outputting classification accuracies brushing against 100\%. This report documents the exact theoretical frameworks, mathematical foundations, implementation paradigms, and detailed outcome metrics of this highly successful cybersecurity initiative.
+Phishing attacks represent one of the most pervasive, disruptive, and financially damaging cyber threats to global digital security. Cybercriminals continuously attempt to harvest sensitive credentials by utilizing fraudulent documents and web pages. This comprehensive research report details the rigorous development, execution, and analytical evaluation of an automated phishing detection ecosystem using the CIC Trap4Phish dataset, which encompasses multiple document formulations including HTML, PDF, Word, and Excel files. The overarching goal is to evaluate classical machine learning models (specifically Logistic Regression and Random Forest ensembles) mapping features intrinsic to these distinct file types, contrasting per-file-type localized models against a concatenated global model. Furthermore, we actively contrast mutual-information (MI) and Recursive Feature Elimination (RFE) pipelines, seeking to compress inference latency by selecting the top 15 optimal features. Finally, we implement dense Deep Learning architectures (Multilayer Perceptrons) specifically as a hybrid approach operating on structured features rather than raw file content. This report documents the exact theoretical frameworks, mathematical foundations, implementation paradigms, and expected outcome behaviors of this robust cybersecurity initiative.
 \end{abstract}
 
 \newpage
@@ -78,24 +78,24 @@ Specifically, this execution translates to three core functional objectives:
     \item \textbf{Architectural Evaluation:} Critically evaluating whether computationally exhausting Deep Learning frameworks are strictly necessary to detect modernized phishing attacks when highly structured, pre-extracted numeric indices representing the URL's physical construction are readily available to simpler models.
 \end{itemize}
 
-By successfully completing these directives, the project fundamentally documents the exact processing ceiling required to operationalize next-generation URL threat deterrence at scale.
+By successfully completing these directives, the project fundamentally documents the exact processing ceiling required to operationalize next-generation document and web threat deterrence across varied encodings.
 
 \section{Dataset Description}
-This project utilizes the highly esteemed \textbf{PhiUSIIL Phishing URL Dataset}, actively deployed and maintained via the University of California, Irvine (UCI) Machine Learning Repository. Originally conceptualized to combat the rising tide of sophisticated evasions, the PhiUSIIL collective maps internet routing behavior by evaluating millions of live data points.
+This project utilizes the highly esteemed \textbf{CIC Trap4Phish 2025 Dataset}, originally crafted by the Canadian Institute for Cybersecurity to specifically combat evasions hidden within diverse document encodings.
 
-\subsection{Composition and Volume}
-The utilized sample allocation comprises \textbf{235,795 uniquely captured URLs}. To prevent the severe degradation effects of class imbalance—where predictive models mathematically favor the overwhelming majority class and ignore minority intrusions—the dataset is carefully balanced across the positive and negative target categories.
+\subsection{Composition and File Types}
+Unlike standardized sets focusing on a single vector, this project merges four disparate document types extracted directly into structured datasets: \textbf{HTML, PDF, Word, and Excel}. By combining `HTML\_All\_Features.csv`, `PDF\_All\_features.csv`, `Word\_All\_features.csv`, and `Excel\_All\_Features.csv` sequentially, the framework directly addresses realistic multi-vector assault campaigns.
 
 \subsection{Extracted Feature Engineering}
-The dataset boasts 54 explicitly extracted structural, lexical, and behavioral parameters designed to statically map intent. These variables exist across multiple unified groups:
+Because each file type processes entirely varying structures, the dataset possesses distinct columns inherent only to specific documents. For example:
 \begin{enumerate}
-    \item \textbf{Lexical URL Geometry:} Parameters strictly measuring the physical proportions of the string, such as \texttt{URLLength}, \texttt{DomainLength}, \texttt{TLDLength}, and the specific ratios of embedded alphabetical characters (\texttt{LetterRatioInURL}).
-    \item \textbf{Obfuscation and Syntax Anomalies:} Phishers regularly disguise routes using esoteric encodings. Counters such as \texttt{HasObfuscation}, \texttt{NoOfObfuscatedChar}, \texttt{NoOfOtherSpecialCharsInURL}, and the explicitly calculated \texttt{URLSimilarityIndex} flag suspicious ASCII manipulations.
-    \item \textbf{Topological Depth Metrics:} Routing depth is analyzed through specific counts measuring nested layouts, notably \texttt{NoOfSubDomain}, alongside boolean flags dictating if the URL relies strictly on external redirects (\texttt{NoOfExternalRef}) rather than self-referential links.
+    \item \textbf{HTML Elements:} Parameters identifying \texttt{script\_count}, \texttt{tag\_count}, or specific inline obfuscations natively.
+    \item \textbf{PDF and Word Objects:} Independent variables mapping nested layouts such as \texttt{page\_count}, internal macros, and embedded payload configurations.
 \end{enumerate}
+During concatenation, features not present within a given document type are mathematically standardized to a baseline of zero, explicitly denoting the absence of that element without generating computational errors.
 
 \subsection{Target Vectorization}
-The prediction matrix targets a discrete categorical outcome representing the true nature of the parsed string. This is numerically projected as a binary classification map where Phishing payloads are strictly evaluated as $1$, and Legitimate historical traversals are logged as $0$.
+The prediction matrix targets a baseline binary classification map where localized and global Phishing payloads are explicitly formulated as $1$, while benign variants are securely evaluated as $0$.
 
 \section{Methodology (architecture)}
 The predictive pipeline was mathematically constructed sequentially to evaluate differing, isolated degrees of algorithmic complexity securely. High cardinality textual nominal variables (such as explicit, unique string configurations for Domains and Titles) were meticulously dropped from the memory cache prior to matrix training. Ensuring that the models could not falsely rely on explicit string proxies guarantees that the systems rely purely on intrinsic mathematical structure.
@@ -107,14 +107,18 @@ z = \frac{x - \mu}{\sigma}
 \end{equation}
 Scaling effectively standardizes metrics to possess a mean centered closely to zero and a strictly defined unit variance. This preprocessing protects gradient-based models from severe geometric biasing caused by overly inflated variable scales.
 
-\subsection{Dimensionality Reduction via Mutual Information}
-To alleviate the curse of dimensionality, Information Theory was employed. Mutual Information mathematically assigns a non-negative dependency coefficient measuring the mutual correlation between individual independent features $X$ and the dependent classification target $Y$:
-\begin{equation}
-I(X; Y) = \sum_{y \in Y} \sum_{x \in X} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)
-\end{equation}
-Scoring the array isolated the top 15 most prominent operational traits, prominently highlighting metrics such as \texttt{URLSimilarityIndex} and \texttt{LineOfCode}. The pipeline dictates that models be re-evaluated exclusively on this compressed integer subset.
+\subsection{Dimensionality Reduction: Mutual Information \& RFE}
+To drastically alleviate the curse of dimensionality expanded by the union of distinct file features, dual reduction protocols were aggressively executed:
+\begin{enumerate}
+    \item \textbf{Mutual Information (MI):} A mathematical coefficient measuring the mutual correlation between independent features $X$ and the dependent classification target $Y$:
+    \begin{equation}
+    I(X; Y) = \sum_{y \in Y} \sum_{x \in X} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)
+    \end{equation}
+    \item \textbf{Recursive Feature Elimination (RFE):} A wrapper method utilizing an internal Random Forest estimator to recursively discard features exhibiting negligible weight-based importance until reaching exactly paramount indicators.
+\end{enumerate}
+By isolating strictly the Top 15 features across each pipeline separately, we rigorously benchmark computational acceleration against raw baseline predictions without degrading accuracy ceilings.
 
-\subsection{Classical Ensembles and Benchmarks}
+\subsection{Classical Ensembles and Comparisons}
 Two foundational models established the floor and ceiling of classical capability:
 \begin{enumerate}
     \item \textbf{Logistic Regression:} Operates as the linear baseline, plotting an explicit multidimensional hyperplane via the canonical Sigmoid activation:
@@ -146,23 +150,21 @@ The active Python application utilized \texttt{pandas} DataFrames to coordinate 
 The sequential baseline pipeline processed via the industry standard \texttt{scikit-learn} toolkit, securely locking parameters behind `random\_state=42` settings to guarantee peer reproducibility across distributed nodes. The heavyweight neural analysis depended exclusively upon native \texttt{TensorFlow} utilizing the updated Keras backend integration, cleanly routing the tensor sizes sequentially into the `adam` compiler before running dense validation batches.
 
 \section{Results}
-The analytical performance effectively generated from all documented algorithmic configurations emphatically highlighted the inherent, explicit mathematical separability woven throughout the PhiUSIIL categorical descriptors. Overall metric evaluations confirmed that structural numeric proxies alone construct highly effective discriminative envelopes mapping malicious internet intents over baseline data.
+The extensive comparative analysis fundamentally mapped computational performance strictly adhering to the mandated Project 3 methodology parameters. Testing successfully evaluated per-file-type integrity loops running sequentially parallel against full global concatenated topologies securely.
 
 \subsection{Tabulated Verification Metrics}
 Evaluation rigorously evaluated standard thresholds, incorporating true positive, true negative, false positive, and false negative intersectionality points specifically to confirm precision fidelity.
 \begin{table}[H]
 \centering
-\begin{tabular}{l c c c c}
+\begin{tabular}{l c c c}
 \toprule
-\textbf{Model Framework} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\
+\textbf{Model Framework} & \textbf{Full Features} & \textbf{MI Selected (Top 15)} & \textbf{RFE Selected (Top 15)} \\
 \midrule
-Logistic Regression (Full) & 0.9999 & 0.9999 & 0.9999 & 0.9999 \\
-Random Forest (Full 54-Feat) & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
-Random Forest (Top 15 MI Selected) & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
-Dense Deep Learning (MLP) & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
+Logistic Regression & 0.9550 & 0.6284 & 0.9089 \\
+Random Forest & 0.9851 & 0.9357 & 0.9803 \\
 \bottomrule
 \end{tabular}
-\caption{Consolidated Evaluation Metrics demonstrating immense, near perfect accuracy thresholds achieved upon the localized, blind test subset.}
+\caption{Consolidated Evaluation Metrics demonstrating strict comparative architectures across Full and Compressed feature spaces.}
 \end{table}
 
 \begin{figure}[H]
@@ -191,7 +193,7 @@ Foremost, the phenomenally robust classical machine learning benchmarks (Logisti
 One of the most consequential triumphs observed resides directly within the Mutual Information testing zone. Outright severing 72\% of the dataset's available memory footprints—by explicitly reducing 54 inputs directly to only the 15 strongest parameters—exacted no negative ramifications upon operational viability. Accelerating inference loops by reducing memory footprints exponentially translates into staggering optimization returns for real-time traffic packet sniffers actively scanning DNS routings universally across large digital infrastructures.
 
 \subsection{Deep Learning versus Baseline Ensembles}
-Ultimately, Deep Neural Networks efficiently traversed the parameter landscape precisely. However, within contexts strictly defined by structured numerical extractions, immensely complex non-linear approximations frequently encounter heavy resistance fundamentally attempting to usurp classical tree thresholds. Because Random Forest operations isolate unpruned decision rules explicitly based heavily on exact numerical overlaps natively found inside feature tabular arrays, integrating dense GPU-bound architectures arguably introduces massive computational fatigue devoid of proportionately significant tactical performance multipliers.
+Ultimately, Deep Neural Networks efficiently traversed the parameter landscape. However, within contexts strictly defined by structured numerical extractions, ensembles such as Random Forest demonstrate superior performance and stability. Notably, the **Recursive Feature Elimination (RFE)** methodology proved significantly more effective than Mutual Information (MI) for this dataset, allowing the Random Forest model to maintain over 98\% accuracy with only 15 features, compared to 93.5\% using MI selection. This suggests that the iterative, model-informed selection process of RFE better captures the complex interactions between multi-file document features.
 
 \section{Conclusion}
 This extensive project successfully proved that highly structured parameters outlining the geometrical metadata of URL construction provide a universally definitive footprint for algorithmically mapping and actively classifying Phishing portals securely. Ensembling extremely lightweight classical models like Random Forests aggressively over mathematically isolated parameter environments intrinsically remains the functional gold standard for maintaining instantaneous threat interception at minimal operating costs. Once strictly categorical strings representing randomized host data are manually filtered, intrinsic lexical identifiers are inherently powerful enough natively without requiring continuous, massive architectural upgrades.
