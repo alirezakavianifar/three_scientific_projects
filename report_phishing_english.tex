@@ -45,7 +45,7 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-Phishing attacks represent one of the most pervasive, disruptive, and financially damaging cyber threats to global digital security. Cybercriminals continuously attempt to harvest sensitive credentials by utilizing fraudulent documents and web pages. This comprehensive research report details the rigorous development, execution, and analytical evaluation of an automated phishing detection ecosystem using the CIC Trap4Phish dataset, which encompasses multiple document formulations including HTML, PDF, Word, and Excel files. The overarching goal is to evaluate classical machine learning models (specifically Logistic Regression and Random Forest ensembles) mapping features intrinsic to these distinct file types, contrasting per-file-type localized models against a concatenated global model. Furthermore, we actively contrast mutual-information (MI) and Recursive Feature Elimination (RFE) pipelines, seeking to compress inference latency by selecting the top 15 optimal features. Finally, we implement dense Deep Learning architectures (Multilayer Perceptrons) specifically as a hybrid approach operating on structured features rather than raw file content. This report documents the exact theoretical frameworks, mathematical foundations, implementation paradigms, and expected outcome behaviors of this robust cybersecurity initiative.
+This study evaluates phishing detection using features extracted from multiple file types, including HTML, PDF, Word, and Excel files, derived from the CIC-Trap4Phish dataset. The research compares classical machine learning models (Logistic Regression, Random Forest) and deep learning architectures while analyzing the impact of feature selection techniques such as Mutual Information (MI) and Recursive Feature Elimination (RFE). By evaluating performance across heterogeneous data sources, we demonstrate that structural and statistical features can effectively distinguish malicious artifacts with high precision. Furthermore, we analyze the trade-offs between feature dimensionality reduction and classification accuracy, providing insights into optimized deployment for real-time cybersecurity environments.
 \end{abstract}
 
 \newpage
@@ -57,7 +57,7 @@ As the global economy increasingly centralizes around digital infrastructure and
 
 Algorithmic classification provides a proactive, resilient, and adaptive defense layer against this asymmetric threat. By training advanced machine learning paradigms to interpret the subtle structural, topological, and lexical anomalies strictly inherent within malicious URLs—such as highly irregular directory string lengths, suspicious non-alphanumeric symbol densities, explicitly disguised semantic subdomains, and anomalous Top-Level Domain (TLD) distributions—cyber-hygiene systems and firewalls can preemptively block entirely novel zero-day phishing links instantaneously. They accomplish this without relying on lag-heavy historical threat feeds or manually curated blocklists that often require hours to trickle down to endpoints.
 
-This project focuses intimately on moving away from rudimentary string-matching filters towards robust, multi-dimensional statistical models capable of predicting the underlying intent of a URL without needing to render the potentially dangerous HTML context of the subsequent web page. Analyzing static URL metadata offline ensures high throughput and zero risk of executing contained browser-based payloads. By scaling this evaluation across essentially a quarter of a million established vectors, we aim to validate the structural integrity of next-generation algorithmic intrusion detection.
+This project focuses intimately on moving away from rudimentary string-matching filters towards robust, multi-dimensional statistical models capable of predicting the underlying intent of a file without needing to render the potentially dangerous content. Unlike traditional URL-based detection systems, this study extends the analysis to multiple file formats commonly used in phishing campaigns, including document-based and web-based artifacts. This allows a broader evaluation of structural and statistical features across heterogeneous data sources. By scaling this evaluation across established vectors, we aim to validate the structural integrity of next-generation algorithmic intrusion detection.
 
 \section{Literature Review}
 Historically, Phishing detection historically hinged entirely upon static signatures, IP reputation blocklists, and crowdsourced reporting databases (such as PhishTank and OpenPhish). While accurate for known threats, these reactive frameworks possess an inherent "patient zero" problem, continuously failing to intercept customized, temporarily generated spear-phishing links crafted for specific corporate targets.
@@ -81,31 +81,37 @@ Specifically, this execution translates to three core functional objectives:
 By successfully completing these directives, the project fundamentally documents the exact processing ceiling required to operationalize next-generation document and web threat deterrence across varied encodings.
 
 \section{Dataset Description}
-This project utilizes the highly esteemed \textbf{CIC Trap4Phish 2025 Dataset}, originally crafted by the Canadian Institute for Cybersecurity to specifically combat evasions hidden within diverse document encodings.
+This project utilizes feature datasets derived from the CIC-Trap4Phish framework, consisting of multiple file types typically utilized in phishing campaigns. Each dataset contains pre-extracted structural and statistical features representing potential phishing characteristics.
 
 \subsection{Composition and File Types}
-Unlike standardized sets focusing on a single vector, this project merges four disparate document types extracted directly into structured datasets: \textbf{HTML, PDF, Word, and Excel}. By combining `HTML\_All\_Features.csv`, `PDF\_All\_features.csv`, `Word\_All\_features.csv`, and `Excel\_All\_Features.csv` sequentially, the framework directly addresses realistic multi-vector assault campaigns.
+The analysis incorporates four distinct document types extracted directly into structured datasets:
+\begin{itemize}
+    \item \textbf{HTML files:} Web-based artifacts.
+    \item \textbf{PDF documents:} Portable Document Format files.
+    \item \textbf{Microsoft Word files:} Word processing documents.
+    \item \textbf{Microsoft Excel files:} Spreadsheet documents.
+\end{itemize}
 
-\subsection{Extracted Feature Engineering}
-Because each file type processes entirely varying structures, the dataset possesses distinct columns inherent only to specific documents. For example:
-\begin{enumerate}
-    \item \textbf{HTML Elements:} Parameters identifying \texttt{script\_count}, \texttt{tag\_count}, or specific inline obfuscations natively.
-    \item \textbf{PDF and Word Objects:} Independent variables mapping nested layouts such as \texttt{page\_count}, internal macros, and embedded payload configurations.
-\end{enumerate}
-During concatenation, features not present within a given document type are mathematically standardized to a baseline of zero, explicitly denoting the absence of that element without generating computational errors.
+\subsection{Feature Engineering and Merging}
+Each dataset contains unique columns inherent to the specific file type (e.g., script counts for HTML, object counts for PDF). To enable a unified analysis, all datasets were merged into a single combined dataset. During this process:
+\begin{itemize}
+    \item A new categorical feature was introduced to indicate the original file type.
+    \item Features not present in a particular file type were imputed with a baseline of zero.
+    \item High-cardinality metadata (such as titles or specific URLs) were excluded to focus on structural indicators.
+\end{itemize}
 
 \subsection{Target Vectorization}
-The prediction matrix targets a baseline binary classification map where localized and global Phishing payloads are explicitly formulated as $1$, while benign variants are securely evaluated as $0$.
+The target variable is binary, where malicious files are labeled as $1$ (Phishing) and benign files are labeled as $0$. The combined dataset provides a comprehensive representation of modern multi-vector phishing threats.
 
 \section{Methodology (architecture)}
 The predictive pipeline was mathematically constructed sequentially to evaluate differing, isolated degrees of algorithmic complexity securely. High cardinality textual nominal variables (such as explicit, unique string configurations for Domains and Titles) were meticulously dropped from the memory cache prior to matrix training. Ensuring that the models could not falsely rely on explicit string proxies guarantees that the systems rely purely on intrinsic mathematical structure.
 
-\subsection{Data Standardization}
-Given that the numeric scale across 54 independent features ranges massively—with binary flags bounded by $[0, 1]$ contrasting against absolute lengths scaling into the thousands—the input matrices were normalized via standard Z-score transformation:
+\subsection{Data Standardization and Leakage Prevention}
+To ensure scientific validity and prevent data leakage, feature scaling was applied only after splitting the dataset into training and testing subsets. The numeric scale across independent features was normalized via standard Z-score transformation:
 \begin{equation}
 z = \frac{x - \mu}{\sigma}
 \end{equation}
-Scaling effectively standardizes metrics to possess a mean centered closely to zero and a strictly defined unit variance. This preprocessing protects gradient-based models from severe geometric biasing caused by overly inflated variable scales.
+Crucially, the \texttt{StandardScaler} was fitted exclusively on the training data and subsequently applied to the test data. This practice ensures that no information from the test set influences the model training process.
 
 \subsection{Dimensionality Reduction: Mutual Information \& RFE}
 To drastically alleviate the curse of dimensionality expanded by the union of distinct file features, dual reduction protocols were aggressively executed:
@@ -118,17 +124,18 @@ To drastically alleviate the curse of dimensionality expanded by the union of di
 \end{enumerate}
 By isolating strictly the Top 15 features across each pipeline separately, we rigorously benchmark computational acceleration against raw baseline predictions without degrading accuracy ceilings.
 
-\subsection{Classical Ensembles and Comparisons}
+\subsection{Classical Ensembles and Evaluation Scenarios}
 Two foundational models established the floor and ceiling of classical capability:
 \begin{enumerate}
-    \item \textbf{Logistic Regression:} Operates as the linear baseline, plotting an explicit multidimensional hyperplane via the canonical Sigmoid activation:
-    \begin{equation}
-    P(y=1|X) = \frac{1}{1 + e^{-(\beta_0 + \sum \beta_i X_i)}}
-    \end{equation}
-    \item \textbf{Random Forest Classification:} A sprawling ensemble architecture that aggregates unpruned decision trees via bootstrap aggregation (Bagging). Nodes calculate optimal splitting rules using Gini Impurity formulas:
-    \begin{equation}
-    Gini = 1 - \sum_{i=1}^{C} (p_i)^2
-    \end{equation}
+    \item \textbf{Logistic Regression:} Operates as the linear baseline, plotting an explicit multidimensional hyperplane via the canonical Sigmoid activation.
+    \item \textbf{Random Forest Classification:} A sprawling ensemble architecture that aggregates unpruned decision trees via bootstrap aggregation (Bagging).
+\end{enumerate}
+
+All models were trained and evaluated consistently across three distinct scenarios:
+\begin{enumerate}
+    \item \textbf{Full feature set:} Using all available numeric features.
+    \item \textbf{Mutual Information selected features:} Reducing the space to the top 15 features based on entropy reduction.
+    \item \textbf{RFE selected features:} Reducing the space to the top 15 features based on iterative model feedback.
 \end{enumerate}
 
 \subsection{Deep Learning Foundations}
@@ -141,13 +148,11 @@ L(y, \hat{y}) = - \frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1-y_i
 The architecture evaluates predictions against the canonical Binary Cross-Entropy loss map defined above, aggressively updating internal gradients via the robust Adam optimizer subroutine.
 
 \section{Implementation}
-Development explicitly proceeded within an isolated, cloud-based Google Colab analytical instance. Executing the process remotely allowed raw datasets to be pushed entirely through high-speed, enterprise-grade data APIs directly from the University of California server banks via the specialized \texttt{ucimlrepo} python framework, inherently bypassing localized runtime memory limitations natively on local machines.
+The datasets were loaded from separate CSV files corresponding to each file type (HTML, PDF, Word, Excel). These were merged into a unified DataFrame, and a new categorical variable representing the file type was introduced. Preprocessing involved handling missing values (imputed as zero) and removing redundant duplicates.
 
-\subsection{Preprocessing Execution}
-The active Python application utilized \texttt{pandas} DataFrames to coordinate the immense volume. Following internal logic flow checks, rows reflecting infinite representations or trailing missing nulls were gracefully imputed or flushed out. Crucially, the target array mapping ($y$-vector) was decoupled perfectly, and an 80/20 train-test split was executed using strict target stratification—guaranteeing that both training matrices and blinded test matrices maintained identical minority-to-majority class proportional integrity. Extraneous string columns (\texttt{URL}, \texttt{Title}) were outright purged.
+The consolidated dataset was then split into training and testing sets using an 80/20 stratified split. Feature scaling was applied using \texttt{StandardScaler} fitted only on the training data. Additionally, models were evaluated separately on each file type to analyze performance variations across different phishing data sources.
 
-\subsection{Network Compiling}
-The sequential baseline pipeline processed via the industry standard \texttt{scikit-learn} toolkit, securely locking parameters behind `random\_state=42` settings to guarantee peer reproducibility across distributed nodes. The heavyweight neural analysis depended exclusively upon native \texttt{TensorFlow} utilizing the updated Keras backend integration, cleanly routing the tensor sizes sequentially into the `adam` compiler before running dense validation batches.
+The baseline pipelines were implemented using \texttt{scikit-learn}, using fixed random seeds for reproducibility. Deep learning architectures were constructed using \texttt{TensorFlow/Keras}, incorporating dense layers and Dropout regularization to ensure generalizability.
 
 \section{Results}
 The extensive comparative analysis fundamentally mapped computational performance strictly adhering to the mandated Project 3 methodology parameters. Testing successfully evaluated per-file-type integrity loops running sequentially parallel against full global concatenated topologies securely.
@@ -158,30 +163,30 @@ Evaluation rigorously evaluated standard thresholds, incorporating true positive
 \centering
 \begin{tabular}{l c c c}
 \toprule
-\textbf{Model Framework} & \textbf{Full (50+ Feat)} & \textbf{MI Selected (Top 15)} & \textbf{RFE Selected (Top 15)} \\
+\textbf{Model Framework} & \textbf{Full Accuracy} & \textbf{MI (Top 15)} & \textbf{RFE (Top 15)} \\
 \midrule
 Logistic Regression & 0.9514 & 0.6581 & 0.8698 \\
 Random Forest & 0.9824 & 0.8484 & 0.9784 \\
 \bottomrule
 \end{tabular}
-\caption{Consolidated Evaluation Metrics demonstrating strict comparative architectures across Full and Compressed feature spaces (Corrected for Data Leakage).}
+\caption{Comparison of accuracy across different feature selection techniques. RFE shows superior performance compared to MI for reduced feature sets.}
 \end{table}
 
 \subsection{Performance across Document Types}
 As part of the multi-vector analysis, baseline models were evaluated on individual document subsets to determine the inherent risk levels associated with different formats.
 \begin{table}[H]
 \centering
-\begin{tabular}{l c}
+\begin{tabular}{l c c}
 \toprule
-\textbf{Document Type} & \textbf{Classifier Accuracy (Baseline RF)} \\
+\textbf{File Type} & \textbf{Accuracy} & \textbf{F1 Score} (RF Baseline) \\
 \midrule
-Microsoft Excel (.xlsx) & 1.0000 \\
-Microsoft Word (.docx) & 1.0000 \\
-Adobe PDF (.pdf) & 0.9982 \\
-HTML / Web (.html) & 0.9350 \\
+HTML      & 0.9357 & 0.9353 \\
+PDF       & 0.9987 & 0.9987 \\
+Word      & 1.0000 & 1.0000 \\
+Excel     & 1.0000 & 1.0000 \\
 \bottomrule
 \end{tabular}
-\caption{Comparison of detection accuracy across disparate file formats within the CIC Trap4Phish ecosystem.}
+\caption{Model performance breakdown by file type using Random Forest baseline.}
 \end{table}
 
 \begin{figure}[H]
@@ -190,7 +195,7 @@ HTML / Web (.html) & 0.9350 \\
     \caption{Visualized Performance Overview plotting extreme proximity to absolute perfection across all evaluated pipelines.}
 \end{figure}
 
-The bar visualizations explicitly indicate absolute parity. The heavily optimized Feature Selected Random Forest effectively matches the exhaustive full-feature models and Deep architectures down to the thousandth decimal limit across multiple metric branches simultaneously without sacrificing precision buffers.
+The models achieved consistently high performance across all configurations, with slight variations depending on the feature selection technique and file type. The Random Forest model demonstrates robust performance even with a significantly reduced feature set (RFE).
 
 \begin{figure}[H]
     \centering
@@ -203,23 +208,24 @@ The loss trajectory graphs above natively define the graceful manner in which th
 \section{Discussion}
 Evaluating our empirical charts dynamically exposes a selection of profound structural conclusions regarding tabular cyber-security defense grids when analyzing sets scaling closely toward a quarter of a million established instances.
 
-\subsection{Exceptional Structural Separability}
-Foremost, the phenomenally robust classical machine learning benchmarks (Random Forest modeling reaching 98.24\%) firmly define that expertly engineered heuristic indicators contained firmly inside the CIC Trap4Phish arrays operate as phenomenally stark proxies. The data inherently provides high linear and non-linear separability; it means that simple geometries drawn strictly across structural combinations (like macro-existence flags vs. script densities) mathematically capture hostile motives beautifully. While accuracy levels approach 100\% for certain document types (Excel, Word), this is attributed to the highly discriminative nature of the Trap4Phish feature extraction methodology rather than data leakage.
-\subsection{Dimensional Decoupling Triumphs}
-One of the most consequential triumphs observed resides directly within the Mutual Information testing zone. Outright severing 72\% of the dataset's available memory footprints—by explicitly reducing 54 inputs directly to only the 15 strongest parameters—exacted no negative ramifications upon operational viability. Accelerating inference loops by reducing memory footprints exponentially translates into staggering optimization returns for real-time traffic packet sniffers actively scanning DNS routings universally across large digital infrastructures.
+\subsection{Impact of File Types}
+Performance varied slightly across file types, indicating that different data sources exhibit varying levels of structural separability. While document-based formats such as PDF, Word, and Excel yielded near-perfect classification, HTML-based features proved slightly more challenging, achieving 93.5\% accuracy. This disparity suggests that document-based phishing often relies on more rigid structural anomalies (like malicious macros or embedded objects), whereas HTML phishing employs more diverse and evolving web-based obfuscations.
 
-\subsection{Deep Learning versus Baseline Ensembles}
-Ultimately, Deep Neural Networks efficiently traversed the parameter landscape. However, within contexts strictly defined by structured numerical extractions, ensembles such as Random Forest demonstrate superior performance and stability. Notably, the **Recursive Feature Elimination (RFE)** methodology proved significantly more effective than Mutual Information (MI) for this dataset, allowing the Random Forest model to maintain over 97.8\% accuracy with only 15 features. This suggests that the iterative, model-informed selection process of RFE better captures the complex interactions between multi-file document features. To ensure scientific validity, all scaling and preprocessing were performed strictly after the train-test split, confirming that these results are free from statistical data leakage.
+\subsection{Feature Selection Impact}
+Both Mutual Information and RFE successfully reduced feature dimensionality without massive degradation in performance for the Random Forest model. Notably, RFE significantly outperformed MI (97.8\% vs 84.8\% for RF), demonstrating that the iterative, model-informed selection process is better suited for capturing predictive interactions in the Trap4Phish dataset. This confirms that a compact subset of features is sufficient for accurate phishing detection when selected correctly.
+
+\subsection{Deep Learning Section Update}
+Deep learning models did not significantly outperform classical methods, likely due to the structured and tabular nature of the input features rather than raw data representations. For tabular cybersecurity data where features already represent high-level structural semantics, ensemble methods like Random Forest provide a more efficient and interpretable solution than dense neural networks.
 
 \section{Conclusion}
-This extensive project successfully proved that highly structured parameters outlining the geometrical metadata of various document document constructions provide a universally definitive footprint for algorithmically mapping and actively classifying phishing portals securely. Ensembling extremely lightweight classical models like Random Forests aggressively over mathematically isolated parameter environments intrinsically remains the functional gold standard for maintaining instantaneous threat interception at minimal operating costs. Once strictly categorical features are manually filtered, intrinsic structural identifiers are inherently powerful enough natively.
+This study demonstrates that phishing detection across multiple file types can be effectively achieved using structured feature representations derived from the CIC-Trap4Phish dataset. Classical machine learning models, particularly Random Forest, provide strong performance while maintaining computational efficiency.
 
-Future analytical integrations scaling outward must aggressively concentrate specifically on bypassing rigid pre-compiled tabulations altogether. Developing models configured natively to consume and semantically interpret unstructured raw sequential character syntax completely end-to-end utilizing aggressive transformer grids natively (such as foundational BERT structures or bi-directional LSTMs) will crucially challenge baseline operational limitations and aggressively test algorithmic elasticity confronting totally undocumented next-generation zero-day evasions.
+The integration of RFE feature selection further enhances the feasibility of deploying these models in real-time environments by reducing dimensionality without sacrificing significant accuracy. Future work should focus on broader cross-dataset validation and exploring adaptive models that can handle the evolving nature of HTML-based threats.
 
 \begin{thebibliography}{10}
 
-\bibitem{phiusiil}
-Prasad, A., \& Chandra, S. (2024). PhiUSIIL Phishing URL Dataset. \textit{UCI Machine Learning Repository} (Dataset ID: 967).
+\bibitem{trap4phish}
+Canadian Institute for Cybersecurity. (2025). CIC-Trap4Phish Dataset. \url{https://www.unb.ca/cic/datasets/index.html}
 \bibitem{sklearn}
 Pedregosa, F. et al. (2011). Scikit-learn: Machine Learning in Python. \textit{Journal of Machine Learning Research}, 12, 2825-2830.
 \bibitem{tensorflowkeras}
